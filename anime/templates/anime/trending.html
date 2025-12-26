@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Trending Anime{% endblock %}
+
+{% block content %}
+
+<section class="trending-section">
+    <h2 class="section-title">Trending</h2>
+
+    <div class="trending-wrapper">
+        <button class="nav-btn left" onclick="scrollTrending(-1)">‹</button>
+
+        <div class="trending-row" id="trendingRow">
+            {% for anime in trending_anime %}
+            <div class="trending-card">
+                <div class="poster">
+                    <img src="{{ anime.image }}" alt="{{ anime.title }}">
+                </div>
+
+                <div class="anime-title">{{ anime.title }}</div>
+                <div class="anime-rank">
+                    {{ anime.rank|stringformat:"02d" }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button class="nav-btn right" onclick="scrollTrending(1)">›</button>
+    </div>
+</section>
+
+<script>
+function scrollTrending(direction) {
+    const row = document.getElementById("trendingRow");
+    const scrollAmount = 300;
+    row.scrollBy({
+        left: direction * scrollAmount,
+        behavior: "smooth"
+    });
+}
+</script>
+
+{% endblock %}

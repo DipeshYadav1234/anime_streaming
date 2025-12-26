@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if query %}Search: {{ query }} | Anime Geek{% else %}Home | Anime Geek{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<!-- ================= PAGE HEADER ================= -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">
+            {% if query %}Search results{% else %}Top Anime{% endif %}
+        </h1>
+    </div>
+</div>
+
+
+<!-- Hero carousel start -->
+{% if not query %}
+<section class="hero-carousel">
+
+    <div class="hero-slides">
+        {% for anime in upcoming_anime %}
+        <div class="hero-slide {% if forloop.first %}active{% endif %}"
+             style="background-image:url('{{ anime.image }}')">
+
+            <div class="hero-overlay"></div>
+
+            <div class="hero-content">
+                <span class="hero-badge">Upcoming</span>
+
+                <h1 class="hero-title">{{ anime.title }}</h1>
+
+                <div class="hero-meta">
+                    {% if anime.type %}<span>{{ anime.type }}</span>{% endif %}
+                    {% if anime.episodes %}<span>{{ anime.episodes }} eps</span>{% endif %}
+                    {% if anime.year %}<span>{{ anime.year }}</span>{% endif %}
+                </div>
+
+                <p class="hero-desc">
+                    {{ anime.synopsis|truncatechars:220 }}
+                </p>
+
+                <div class="hero-actions">
+                    <a href="{% url 'anime:anime_detail' anime.mal_id %}" class="btn-watch" style="text-decoration: none;">
+                        ▶ Watch Now
+                    </a>
+                    <a href="{% url 'anime:anime_detail' anime.mal_id %}" class="btn-detail" style="text-decoration: none;">
+                        Details →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <button class="hero-nav left" onclick="prevHero()">‹</button>
+    <button class="hero-nav right" onclick="nextHero()">›</button>
+</section>
+{% endif %}
+
+<!-- Hero carousel end -->
+
+        <p class="page-subtitle">
+            {% if query %}
+                Showing results for "<strong>{{ query }}</strong>"
+            {% else %}
+                Discover trending series and start watching your next favourite show.
+            {% endif %}
+        </p>
+
+<!-- trending section start -->
+    {% if not query %}
+<section class="trending-section">
+    <h2 class="section-title">Trending</h2>
+
+    <div class="trending-wrapper">
+        <button class="nav-btn left" onclick="scrollTrending(-1)">‹</button>
+
+        <div class="trending-row" id="trendingRow">
+            {% for anime in trending_anime %}
+            <a href="{% url 'anime:anime_detail' anime.mal_id %}" class="trending-card">
+                <div class="poster">
+                    <img src="{{ anime.image }}" alt="{{ anime.title }}">
+                </div>
+                
+                
+                <div class="anime-rank">
+                    {{ forloop.counter|stringformat:"02d" }}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <button class="nav-btn right" onclick="scrollTrending(1)">›</button>
+    </div>
+</section>
+
+<script>
+function scrollTrending(direction) {
+    const row = document.getElementById("trendingRow");
+    row.scrollBy({ left: direction * 320, behavior: "smooth" });
+}
+</script>
+{% endif %}
+<!-- trending section end -->
+<br>
+<br>
+
+<!-- ================= MAIN LAYOUT ================= -->
+<div class="home-layout">
+    
+
+    <!-- ===== LEFT SIDEBAR (GENRES) ===== -->
+    <aside class="filter-sidebar">
+        <form method="get" class="genre-filter">
+
+            {% if query %}
+                <input type="hidden" name="q" value="{{ query }}">
+            {% endif %}
+
+            <h3 class="filter-title">Genres</h3>
+
+            <div class="genre-list">
+                {% for genre in all_genres %}
+                <label class="genre-item">
+                    <input type="checkbox"
+                           name="genre"
+                           value="{{ genre }}"
+                           {% if genre in selected_genres %}checked{% endif %}>
+                    <span>{{ genre }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="filter-btn">Apply</button>
+        </form>
+    </aside>
+
+    <!-- ===== RIGHT CONTENT (ANIME GRID) ===== -->
+    <section class="anime-section">
+        <div class="anime-grid">
+
+            {% for item in anime_list %}
+            <a class="anime-card" href="{% url 'anime:anime_detail' item.mal_id %}">
+
+                <div class="anime-card-img-wrapper">
+                    {% if item.images.jpg.image_url %}
+                        <img src="{{ item.images.jpg.image_url }}" alt="{{ item.title }}">
+                    {% endif %}
+                    <div class="anime-card-gradient"></div>
+
+                    {% if item.type %}
+                        <div class="anime-card-tag">{{ item.type }}</div>
+                    {% endif %}
+
+                    <div class="anime-card-play">
+                        <div class="anime-card-play-circle">▶</div>
+                    </div>
+                </div>
+
+                <div class="anime-card-body">
+                    <h3 class="anime-card-title">{{ item.title }}</h3>
+                    <div class="anime-card-meta">
+                        <span>
+                            {% if item.episodes %}
+                                {{ item.episodes }} eps
+                            {% else %}
+                                Ongoing
+                            {% endif %}
+                        </span>
+                        {% if item.score %}
+                            <span class="meta-pill">★ {{ item.score }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- ===== HOVER PANEL ===== -->
+                <div class="anime-card-hover">
+                    <div class="hover-header">
+                        <div>
+                            <div class="hover-title">{{ item.title }}</div>
+                            <div class="hover-subtitle">
+                                {% if item.type %}{{ item.type }}{% endif %}
+                                {% if item.duration %} • {{ item.duration }}{% endif %}
+                            </div>
+                        </div>
+                        {% if item.score %}
+                        <div class="hover-score">★ {{ item.score }}</div>
+                        {% endif %}
+                    </div>
+
+                    <p class="hover-synopsis">
+                        {{ item.synopsis|default:"No synopsis available."|truncatechars:160 }}
+                    </p>
+
+                    <div class="hover-meta-row">
+                        {% if item.episodes %}
+                            <span class="hover-pill">Episodes: {{ item.episodes }}</span>
+                        {% endif %}
+                        {% if item.status %}
+                            <span class="hover-pill">{{ item.status }}</span>
+                        {% endif %}
+                    </div>
+
+                    <button type="button" class="hover-watch-btn">
+                        ▶ Watch now
+                    </button>
+                </div>
+
+            </a>
+            {% empty %}
+                <p>No anime found.</p>
+            {% endfor %}
+
+        </div>
+    
+        <!-- Load More button -->
+        {% if has_next %}
+<form method="get" class="load-more-form">
+    
+    {% if query %}
+        <input type="hidden" name="q" value="{{ query }}">
+    {% endif %}
+
+    {% for g in selected_genres %}
+        <input type="hidden" name="genre" value="{{ g }}">
+    {% endfor %}
+
+    <input type="hidden" name="page" value="{{ page|add:1 }}">
+
+    <button type="submit" class="load-more-btn">
+        Load More
+    </button>
+</form>
+{% endif %}
+    </section>
+
+</div>
+
+{% endblock %}

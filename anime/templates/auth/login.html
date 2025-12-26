@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="modal-overlay">
+  <div class="auth-modal">
+    <h2>Welcome back!</h2>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <label>Email Address</label>
+      <input type="email" name="email" required>
+
+      <label>Password</label>
+      <input type="password" name="password" required>
+
+      
+
+      <button type="submit" class="btn-primary">Login</button>
+
+      <p>Don’t have an account?
+        <a href="{% url 'anime:register' %}">Register</a>
+      </p>
+    </form>
+  </div>
+</div>
+{% endblock %}

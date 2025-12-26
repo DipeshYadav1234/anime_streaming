@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Watching {{ anime.title }} — Ep {{ episode_number }}{% endblock %}
+
+{% block content %}
+<div class="watch-wrap">
+
+  <!-- LEFT: Episode list -->
+  <div class="watch-left">
+    <aside class="episode-list-card">
+      <div class="ep-list-header">
+        <strong>List of episodes:</strong>
+        <div class="ep-search-wrap">
+          <input id="epSearch" class="ep-search" placeholder="Number of Ep" aria-label="Search episodes">
+        </div>
+      </div>
+
+      <div id="epList" class="ep-list">
+        {% if episodes %}
+          {% for ep in episodes %}
+            {# Use ep.number when present, fallback to forloop.counter #}
+            {% with num=ep.number|default:forloop.counter %}
+            <a href="{% url 'anime:watch_episode' anime.mal_id num %}"
+               class="ep-row {% if num|stringformat:'s' == episode_number|stringformat:'s' %}active{% endif %}"
+               data-ep="{{ num }}">
+              <span class="ep-num">{{ num }}</span>
+
+              <span class="ep-title">
+                {% if ep.title %}
+                  {{ ep.title }}
+                {% else %}
+                  Episode {{ num }}
+                {% endif %}
+              </span>
+
+              <span class="ep-play">▶</span>
+            </a>
+            {% endwith %}
+          {% endfor %}
+        {% else %}
+          <p style="color:var(--muted);padding:12px">No episodes found.</p>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+
+  <!-- MAIN: Player + info -->
+  <div class="watch-main">
+    <div class="player-wrap">
+      {% if video_path %}
+        <video id="videoPlayer" class="video-player" controls preload="metadata" crossorigin>
+          <source src="{{ video_path }}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      {% else %}
+        <div class="video-placeholder">
+          <p>No video available.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="player-controls-row">
+      <div class="watch-info">
+        <h2>{{ anime.title }} — Episode {{ episode_number }}</h2>
+        {% if episode and episode.title %}<p class="ep-title">{{ episode.title }}</p>{% endif %}
+        {% if episode and episode.synopsis %}<p class="ep-synopsis">{{ episode.synopsis }}</p>{% endif %}
+      </div>
+    </div>
+
+    <div class="server-panel">
+      <small>If this server doesn’t work try another (if available)</small>
+      <!-- Add server buttons here -->
+    </div>
+  </div>
+
+  <!-- RIGHT: Sidebar info card -->
+  <aside class="watch-right">
+    <div class="watch-info-card">
+      {% if anime.images.jpg.image_url %}
+        <img src="{{ anime.images.jpg.image_url }}" alt="{{ anime.title }}" class="watch-poster">
+      {% endif %}
+      <h3>{{ anime.title }}</h3>
+      <div class="meta-row">
+        {% if anime.score %}<span class="meta-pill">★ {{ anime.score }}</span>{% endif %}
+        {% if anime.episodes %}<span class="meta-dot">•</span><span>{{ anime.episodes }} eps</span>{% endif %}
+      </div>
+      <p class="watch-desc">{{ anime.synopsis|truncatechars:220 }}</p>
+      <a class="btn btn-ghost" href="{% url 'anime:anime_detail' anime.mal_id %}">View detail</a>
+    </div>
+  </aside>
+
+</div>
+{% endblock %}

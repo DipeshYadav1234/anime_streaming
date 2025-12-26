@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Plans | AnimeGeek{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom:20px;">Choose Your Plan</h2>
+
+<div class="plans-grid">
+
+  {% for plan in plans %}
+    <div class="plan-card">
+      <h3>{{ plan.name }}</h3>
+      <p>₹ {{ plan.price }} / month</p>
+
+      {% if plan.can_watch %}
+        <p>✔ Watch all episodes</p>
+      {% else %}
+        <p>❌ Browse only</p>
+      {% endif %}
+
+      {% if user.is_authenticated %}
+
+        {# CURRENT PLAN #}
+        {% if user.usersubscription.plan.id == plan.id %}
+          <button class="btn disabled" disabled>
+            Current Plan
+          </button>
+
+        {# SHOW UPGRADE ONLY FOR PREMIUM PLAN #}
+        {% elif plan.can_watch %}
+          <a href="{% url 'anime:upgrade' %}" class="ptm-btn">
+            Upgrade
+          </a>
+
+        {# FREE PLAN (DO NOTHING) #}
+        {% else %}
+          <button class="btn disabled" disabled>
+            Free Plan
+          </button>
+        {% endif %}
+
+      {% else %}
+        <a href="{% url 'anime:login' %}" class="btn btn-primary">
+          Login to Subscribe
+        </a>
+      {% endif %}
+
+    </div>
+  {% empty %}
+    <p>No plans available.</p>
+  {% endfor %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">My Watchlist</h1>
+
+<div class="anime-grid">
+    {% for item in items %}
+        <a class="anime-card" href="{% url 'anime:anime_detail' item.mal_id %}">
+            <div class="anime-card-img-wrapper">
+                <img src="{{ item.image_url }}" alt="{{ item.title }}">
+            </div>
+            <div class="anime-card-body">
+                <h3 class="anime-card-title">{{ item.title }}</h3>
+                <a href="{% url 'anime:remove_watchlist' item.mal_id %}" class="watchlist-btn">
+                    ❌ Remove
+                </a>
+            </div>
+        </a>
+    {% empty %}
+        <p>Your watchlist is empty.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

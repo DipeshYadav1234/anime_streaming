@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Anime Geek{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+
+</head>
+
+<body>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Glowing gradient background -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="{% url 'anime:home' %}" class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="AnimeGeek Logo" class="logo-img">
+                <span class="logo-text">AnimeGeek</span>
+            </a>
+
+
+            <form method="get" action="{% url 'anime:home' %}" class="search-bar">
+                <input type="text" name="q" placeholder="Search anime..." value="{{ query|default:'' }}">
+                <button type="submit">Search</button>
+            </form>
+
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'anime:watchlist' %}" class="nav-login-btn">
+                Watchlist
+            </a>
+            <span class="nav-user-name">{{ user.first_name|default:user.username }}</span>
+            <a href="{% url 'anime:logout' %}" class="nav-logout-btn">
+                Logout
+            </a>
+            {% else %}
+            <a href="{% url 'anime:login' %}" class="nav-login-btn">
+                Login
+            </a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+  
+                {% if user_subscription and user_subscription.plan.can_watch %}
+                    <!-- Premium user -->
+                    <span class="premium-badge">🌟 Premium</span>
+
+                {% else %}
+                    <!-- Free user -->
+                    <a href="{% url 'anime:subscriptions' %}" class="nav-login-btn">
+                        Upgrade
+                    </a>
+                {% endif %}
+
+            {% endif %}
+
+
+
+
+
+        </div>
+    </header>
+
+
+
+    <main class="page">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <p>Made with ❤️ in Django</p>
+    </footer>
+
+    <!-- Global JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+
+</body>
+
+</html>

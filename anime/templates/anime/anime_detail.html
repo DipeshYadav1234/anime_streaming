@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ anime.title }} • AnimeGeek{% endblock %}
+
+{% block content %}
+<div class="detail-wrap">
+  <div class="detail-left">
+    <div class="poster-card">
+      {% if anime.images.jpg.image_url %}
+      <img src="{{ anime.images.jpg.image_url }}" alt="{{ anime.title }}">
+      {% endif %}
+      <div class="poster-actions">
+        <a class="action-btn primary" href="{% url 'anime:watch_episode' anime.mal_id 1 %}">▶ Watch now</a>
+        
+      {% if user.is_authenticated %}
+
+        {% if in_watchlist %}
+          <button class="action-btn secondary added" disabled>
+              ✅ In Watchlist
+          </button>
+        {% else %}
+          <a href="{% url 'anime:add_watchlist' anime.mal_id %}" class="action-btn secondary">
+            ❤️ Add to Watchlist
+          </a>
+        {% endif %}
+
+      {% else %}
+        <a href="{% url 'anime:login' %}" class="action-btn secondary">
+          Login to add ❤️
+        </a>
+      {% endif %}
+
+
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-main">
+    <nav class="breadcrumb">
+      <a href="{% url 'anime:home' %}" class="action-btn primary1">Home</a> •
+      <span>{{ anime.type }}</span> •
+      <span>{{ anime.title }}</span>
+    </nav>
+
+    <h1 class="detail-title">{{ anime.title }}</h1>
+
+    <div class="detail-meta">
+      <span class="meta-pill">{{ anime.rating|default:"PG" }}</span>
+      {% if anime.source %}<span class="meta-dot">•</span><span>{{ anime.source }}</span>{% endif %}
+      {% if anime.episodes %}<span class="meta-dot">•</span><span>{{ anime.episodes }} eps</span>{% endif %}
+      {% if anime.duration %}<span class="meta-dot">•</span><span>{{ anime.duration }}</span>{% endif %}
+      {% if anime.aired and anime.aired.from %}<span class="meta-dot">•</span><span>{{ anime.aired.from|date:"M d, Y"}}</span>{% endif %}
+    </div>
+
+    <p class="detail-synopsis">{{ anime.synopsis|default:"No synopsis available." }}</p>
+
+    <div class="detail-extra">
+      <h3>More Seasons / Related</h3>
+      <!-- placeholder for additional sections -->
+    </div>
+
+  </div>
+
+  <aside class="detail-right">
+    <div class="info-card">
+      <h4>Info</h4>
+      <dl>
+        {% if anime.title_japanese %}<dt>Japanese:</dt>
+        <dd>{{ anime.title_japanese }}</dd>{% endif %}
+        {% if anime.synonyms %}<dt>Synonyms:</dt>
+        <dd>{{ anime.synonyms|join:", " }}</dd>{% endif %}
+        {% if anime.aired and anime.aired.from %}<dt>Aired:</dt>
+        <dd>{{ anime.aired.from|date:"M d, Y" }}</dd>{% endif %}
+        {% if anime.season %}<dt>Premiered:</dt>
+        <dd>{{ anime.season }}</dd>{% endif %}
+        {% if anime.duration %}<dt>Duration:</dt>
+        <dd>{{ anime.duration }}</dd>{% endif %}
+        {% if anime.status %}<dt>Status:</dt>
+        <dd>{{ anime.status }}</dd>{% endif %}
+        {% if anime.score %}<dt>MAL Score:</dt>
+        <dd>{{ anime.score }}</dd>{% endif %}
+        {% if anime.genres %}
+        <dt>Genres:</dt>
+        <dd>
+          {% for g in anime.genres %}
+          <span class="genre-pill">{{ g.name }}</span>
+          {% endfor %}
+        </dd>
+        {% endif %}
+      </dl>
+    </div>
+  </aside>
+</div>
+{% endblock %}

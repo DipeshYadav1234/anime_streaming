@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="modal-overlay">
+  <div class="auth-modal">
+    <h2>Create an Account</h2>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <label>Your Name</label>
+      <input type="text" name="name" required>
+
+      <label>Email Address</label>
+      <input type="email" name="email" required>
+
+
+      <small class="password-hint">
+        Password must be at least 8 characters and include uppercase, lowercase,
+        number, and special character.
+      </small>
+      <br>
+      <label>Password</label>
+      <input type="password" name="password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}"
+        title="At least 8 characters, 1 uppercase, 1 lowercase, 1 number & 1 special character">
+
+      <label>Confirm Password</label>
+      <input type="password" name="confirm_password" required>
+
+      <button type="submit" class="btn-primary">Register</button>
+
+      <p>Have an account?
+        <a href="{% url 'anime:login' %}">Login</a>
+      </p>
+    </form>
+  </div>
+</div>
+{% endblock %}

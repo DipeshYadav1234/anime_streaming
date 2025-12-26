@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<h2>Redirecting to payment…</h2>
+
+<script>
+  var options = {
+    "key": "{{ razorpay_key }}",
+    "amount": "{{ amount }}",
+    "currency": "INR",
+    "name": "AnimeGeek",
+    "description": "Premium Subscription",
+    "order_id": "{{ order_id }}",
+    "handler": function (response) {
+        // SUCCESS
+        window.location.href = "{% url 'anime:payment_success' %}";
+    },
+    "modal": {
+        "ondismiss": function () {
+            // ❌ PAYMENT CANCELLED
+            window.location.href = "{% url 'anime:subscriptions' %}?cancelled=1";
+        }
+    },
+    "theme": {
+        "color": "#ff66c4"
+    }
+  };
+
+  var rzp1 = new Razorpay(options);
+  rzp1.open();
+</script>
+
+
+
+
+</body>
+</html>
