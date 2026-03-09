@@ -432,20 +432,28 @@ def subscription_plans(request):
     
 
 
+# @login_required
+# def upgrade_subscription(request, plan_id):
+#     plan = get_object_or_404(SubscriptionPlan, id=plan_id)
+
+#     user_sub, created = UserSubscription.objects.get_or_create(
+#         user=request.user,
+#         defaults={"plan": plan}
+#     )
+
+#     user_sub.plan = plan
+#     user_sub.save()
+
+#     messages.success(request, f"Upgraded to {plan.name} plan 🎉")
+#     return redirect("anime:subscription_plans")
+
 @login_required
 def upgrade_subscription(request, plan_id):
-    plan = get_object_or_404(SubscriptionPlan, id=plan_id)
+    
+    request.session["plan_id"] = plan_id
 
-    user_sub, created = UserSubscription.objects.get_or_create(
-        user=request.user,
-        defaults={"plan": plan}
-    )
-
-    user_sub.plan = plan
-    user_sub.save()
-
-    messages.success(request, f"Upgraded to {plan.name} plan 🎉")
-    return redirect("anime:subscription_plans")
+    
+    return redirect("anime:upgrade")
 
 
 
@@ -474,15 +482,17 @@ def create_payment(request):
 
 @login_required
 def payment_success(request):
-    premium_plan = SubscriptionPlan.objects.get(name="Premium")
+    plan_id = request.session.get("plan_id")
+    plan = get_object_or_404(SubscriptionPlan, id=plan_id)
 
     UserSubscription.objects.update_or_create(
         user=request.user,
         defaults={
-            "plan": premium_plan,
+            "plan": plan,
             "active": True
         }
     )
 
     messages.success(request, "🎉 Premium activated successfully!")
-    return redirect("anime:home")
+
+    return redirect("anime:subscription_plans")

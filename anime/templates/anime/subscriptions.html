@@ -20,18 +20,18 @@
       {% if user.is_authenticated %}
 
         {# CURRENT PLAN #}
-        {% if user.usersubscription.plan.id == plan.id %}
+        {% if user.usersubscription and user.usersubscription.plan.id == plan.id %}
           <button class="btn disabled" disabled>
             Current Plan
           </button>
 
-        {# SHOW UPGRADE ONLY FOR PREMIUM PLAN #}
+        {# SHOW UPGRADE BUTTON FOR PREMIUM PLAN #}
         {% elif plan.can_watch %}
-          <a href="{% url 'anime:upgrade' %}" class="ptm-btn">
+          <a href="{% url 'anime:upgrade_subscription' plan.id %}" class="ptm-btn">
             Upgrade
           </a>
 
-        {# FREE PLAN (DO NOTHING) #}
+        {# FREE PLAN BUTTON #}
         {% else %}
           <button class="btn disabled" disabled>
             Free Plan
